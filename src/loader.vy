@@ -36,6 +36,15 @@ group Audio :: assets {
     explosion_drone = vaudio.load_sound("assets/explosion_drone.ogg");
     siren = vaudio.load_sound("assets/siren.ogg");
     signal_lost = vaudio.load_sound("assets/signal_lost.ogg");
+
+    vaudio.sound_volume(Audio.startup, 3.15);
+    vaudio.sound_volume(Audio.battle, 1.9);
+    vaudio.sound_volume(Audio.chatter, 3.2);
+    vaudio.sound_volume(Audio.drone_flying, 0.8);
+    vaudio.sound_volume(Audio.explosion, 2.9);
+    vaudio.sound_volume(Audio.explosion_drone, 1.3);
+    vaudio.sound_volume(Audio.siren, 1.0);
+    vaudio.sound_volume(Audio.signal_lost, 1.0);
 };
 
 group Models :: assets {    

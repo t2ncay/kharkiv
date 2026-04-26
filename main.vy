@@ -71,15 +71,6 @@ vaudio.play_sound(Audio.startup);
 vaudio.play_sound(Audio.battle);
 vaudio.play_sound(Audio.chatter);
 
-vaudio.sound_volume(Audio.startup, 3.15);
-vaudio.sound_volume(Audio.battle, 1.9);
-vaudio.sound_volume(Audio.chatter, 3.0);
-vaudio.sound_volume(Audio.drone_flying, 0.8);
-vaudio.sound_volume(Audio.explosion, 2.9);
-vaudio.sound_volume(Audio.explosion_drone, 1.3);
-vaudio.sound_volume(Audio.siren, 1.0);
-vaudio.sound_volume(Audio.signal_lost, 1.0);
-
 title_size_intro = vglib.measure_text(Shaders.vcr_font, "KHARKIV, UKRAINE", 80);
 sub_size_intro   = vglib.measure_text(Shaders.vcr_font, "APRIL 25, 2026", 30);
 
@@ -242,7 +233,7 @@ while (vglib.running()) {
 
     vglib.begin_texture_mode(screen_target);
         bg_r = 55 + (strike_intensity * 150);
-        bg_g = 65 + (strike_intensity * 30);
+        bg_g = 65 + (strike_intensity * 40);
         bg_b = 65 + (strike_intensity * 20);
         vglib.clear(vglib.rgba(bg_r, bg_g, bg_b, 255));
         vglib.begin3d(camera);         
