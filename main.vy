@@ -105,7 +105,7 @@ while (vglib.running()) {
     }
     
     if (vglib.key_down(vglib.SPACE)) { 
-        mult = 6.0;
+        mult = 5.0;
     }
 
     f_speed = f_speed * mult;
@@ -143,7 +143,7 @@ while (vglib.running()) {
         }
         
         if (crash_active == false) {
-            p_size = 3.0;
+            p_size = 0.5;
             through tree :: forest_trees -> loop {
                 t_w = 0.8 * tree[3];
                 
