@@ -145,7 +145,7 @@ while (vglib.running()) {
         if (crash_active == false) {
             p_size = 0.5;
             through tree :: forest_trees -> loop {
-                t_w = 0.8 * tree[3];
+                t_w = 1.2 * tree[3];
                 
                 dx = vmath.abs(cam_pos[0] - tree[0]);
                 dz = vmath.abs(cam_pos[2] - tree[2]);
