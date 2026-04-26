@@ -17,7 +17,7 @@ fn :: missions generate_target() {
     tx = vmath.random(-2000, 2000);
     tz = vmath.random(500, 2500); 
     ty = 0.0;
-    
+
     target_pos = [tx, ty, tz];
 }
 
@@ -44,7 +44,6 @@ fn :: missions update(cam_pos) {
 fn :: missions draw_ui(u_col, cam_pos, camera) {
     cx = 960; cy = 540;
 
-    # 1. RANGE yazısı
     dx = cam_pos[0] - target_pos[0];
     dz = cam_pos[2] - target_pos[2];
     dist = int64(vmath.hypot(dx, dz));
@@ -57,7 +56,6 @@ fn :: missions draw_ui(u_col, cam_pos, camera) {
         60, 250, 20, u_col);
     vglib.text_ex(Shaders.vcr_font, "STRIKES: " + string(Params.score), 60, 280, 20, vglib.rgba(255, 50, 50, 200));
 
-    # 2. İstiqamət Oxu (Pointer)
     target_angle = vmath.degrees(vmath.atan2(target_pos[2] - cam_pos[2], target_pos[0] - cam_pos[0]));
     drone_yaw = vglib.get_yaw(camera); 
     total_angle = vmath.radians(target_angle + drone_yaw + 90.0);

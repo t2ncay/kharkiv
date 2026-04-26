@@ -47,7 +47,6 @@ group Models :: assets {
     vglib.set_alpha_discard(tree_model);
 
     # --- TARGETS ---
-
     target_model = vglib.load_model("assets/ps1_tank_2.glb");
     target_model_texture = vglib.load_texture("assets/ps1_tank_texture.png");
 

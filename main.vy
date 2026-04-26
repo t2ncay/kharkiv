@@ -270,7 +270,6 @@ while (vglib.running()) {
         vglib.end3d();
     vglib.end_texture_mode();
 
-    # 2. VHS DISTORTION PASS
     vglib.begin_texture_mode(bodycam_target);
         vglib.clear(vglib.BLACK);
         vglib.set_shader_value(Shaders.vhs_color, "time", run_time);
@@ -378,7 +377,7 @@ while (vglib.running()) {
                     vglib.draw_render_texture(screen_target); 
                 vglib.end_shader();
 
-                u_col = vglib.rgba(180, 255, 180, 180); # (Night Vision Green)
+                u_col = vglib.rgba(180, 255, 180, 180);
 
                 missions.update(cam_pos);
                 missions.draw_ui(u_col, cam_pos, camera);
@@ -436,11 +435,11 @@ while (vglib.running()) {
                     vglib.line(curr_x, compass_y, curr_x, compass_y + 20, u_col);
                 };
                 vglib.text_ex(Shaders.vcr_font, "219", 945, 110, 15, u_col);
-                vglib.line(960, 70, 960, 100, vglib.WHITE); # Mərkəzi göstərici
+                vglib.line(960, 70, 960, 100, vglib.WHITE);
 
                 vglib.text_ex(Shaders.vcr_font, "3 C", 60, 40, 18, u_col);
                 vglib.text_ex(Shaders.vcr_font, "AREA: 34M2", 60, 70, 18, u_col);
-                vglib.text_ex(Shaders.vcr_font, "ARM", cx - 30, cy - size - 30, 15, vglib.rgba(255, 50, 50, 200)); # Red ARM dot
+                vglib.text_ex(Shaders.vcr_font, "ARM", cx - 30, cy - size - 30, 15, vglib.rgba(255, 50, 50, 200));
 
                 cur_x = cam_pos[0];
                 cur_z = cam_pos[2];
