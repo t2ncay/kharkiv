@@ -37,6 +37,11 @@ turn_speed = 1.5;
 lost_alpha = 0.0;
 old_score = 0;
 current_speed_mult = 2.4;
+vel_x = 0.0;
+vel_y = 0.0;
+vel_z = 0.0;
+drag = 0.98;
+accel = 0.5;
 
 # --- ARTILLERY EVENT STATE ---
 strike_active = false;
@@ -82,44 +87,47 @@ missions.init_next();
 
 while (vglib.running()) {
     run_time = run_time + 0.016;
-    temp_pos = vglib.get_pos(camera);
-    cam_y = temp_pos[1];
+    cam_pos = vglib.get_pos(camera);
+    cam_y = cam_pos[1];
 
-    current_speed_mult = 2.4;
-
-    f_speed = Engine.fly_speed;
-    v_speed = 0.5;
     mult = 1.0;
+    if (vglib.key_down(vglib.LEFT_SHIFT)) { mult = 2.4; } 
+    if (vglib.key_down(vglib.SPACE))      { mult = 6.0; } 
 
-    if (vglib.key_down(vglib.LEFT_SHIFT)) { 
-        mult = 2.4; 
-    }
-    
-    if (vglib.key_down(vglib.SPACE)) { 
-        mult = 5.0;
-    }
+    target_vel_z = Engine.fly_speed * mult;
+    vel_z = vel_z + (target_vel_z - vel_z) * 0.1;
 
-    f_speed = f_speed * mult;
-    v_speed = v_speed * mult;
+    target_vel_y = 0.0;
+    if (vglib.key_down(vglib.W)) { target_vel_y = -1.1 * mult; }
+    if (vglib.key_down(vglib.S)) { target_vel_y = 1.1 * mult; }
 
-    vglib.move_forward(camera, f_speed);
-    if (vglib.key_down(vglib.S)) { cam_y = cam_y + v_speed; }
-    if (vglib.key_down(vglib.W)) { cam_y = cam_y - v_speed; }
+    vel_y = vel_y + (target_vel_y - vel_y) * 0.1;
 
-    if (vglib.key_down(vglib.Q)) {
+    target_vel_x = 0.0;
+    if (vglib.key_down(vglib.Q)) { 
         target_roll = -30.0; 
-        vglib.move_right(camera, -f_speed); 
+        target_vel_x = -1.5 * mult;
     } else if (vglib.key_down(vglib.E)) {
         target_roll = 30.0;
-        vglib.move_right(camera, f_speed);
+        target_vel_x = 1.5 * mult;
     } else {
         target_roll = 0.0;
     }
+    
+    vel_x = vel_x + (target_vel_x - vel_x) * 0.1;
 
+    vibration = vmath.sin(run_time * 100.0) * 0.04;
+
+    vglib.move_forward(camera, vel_z);
+    vglib.move_right(camera, vel_x);
+    
+    cam_y = cam_y + vel_y + vibration;
     vglib.set_camera_height(camera, cam_y);
+
     current_roll = current_roll + (target_roll - current_roll) * roll_speed;
     vglib.set_roll(camera, current_roll);
 
+    vglib.rotate_view(camera, Engine.rotation_speed);
     cam_pos = vglib.get_pos(camera);
     cam_y = cam_pos[1];
 
