@@ -36,6 +36,7 @@ roll_speed = 0.1;
 turn_speed = 1.5;
 lost_alpha = 0.0;
 old_score = 0;
+current_speed_mult = 2.4;
 
 # --- ARTILLERY EVENT STATE ---
 strike_active = false;
@@ -60,7 +61,7 @@ forest_trees = [];
 
 through i :: 0..forest_density -> loop {
     tx = vmath.random(-2500, 2500);
-    tz = vmath.random(-2500, 2500);
+    tz = vmath.random(-2000, 2500); 
     
     t_scale = 4.0 + (vmath.random(0, 100) / 100.0);
     forest_trees = forest_trees + [[tx, 0.0, tz, t_scale]];
@@ -90,8 +91,90 @@ missions.init_next();
 
 while (vglib.running()) {
     run_time = run_time + 0.016;
+    temp_pos = vglib.get_pos(camera);
+    cam_y = temp_pos[1];
+
+    current_speed_mult = 2.4;
+
+    f_speed = Engine.fly_speed;
+    v_speed = 0.5;
+    mult = 1.0;
+
+    if (vglib.key_down(vglib.LEFT_SHIFT)) { 
+        mult = 2.4; 
+    }
+    
+    if (vglib.key_down(vglib.SPACE)) { 
+        mult = 6.0;
+    }
+
+    f_speed = f_speed * mult;
+    v_speed = v_speed * mult;
+
+    vglib.move_forward(camera, f_speed);
+    if (vglib.key_down(vglib.S)) { cam_y = cam_y + v_speed; }
+    if (vglib.key_down(vglib.W)) { cam_y = cam_y - v_speed; }
+
+    if (vglib.key_down(vglib.Q)) {
+        target_roll = -30.0; 
+        vglib.move_right(camera, -f_speed); 
+    } else if (vglib.key_down(vglib.E)) {
+        target_roll = 30.0;
+        vglib.move_right(camera, f_speed);
+    } else {
+        target_roll = 0.0;
+    }
+
+    vglib.set_camera_height(camera, cam_y);
+    current_roll = current_roll + (target_roll - current_roll) * roll_speed;
+    vglib.set_roll(camera, current_roll);
+
     cam_pos = vglib.get_pos(camera);
     cam_y = cam_pos[1];
+
+    if (crash_active == false && signal_lost == false) {
+        
+        if (cam_y <= 0.0) {
+            crash_active = true;
+            crash_timer = crash_duration;
+            vaudio.play_sound(Audio.explosion_drone);
+            vaudio.play_sound(Audio.explosion);
+            vaudio.play_sound(Audio.signal_lost);
+        }
+        
+        if (crash_active == false) {
+            p_size = 3.0;
+            through tree :: forest_trees -> loop {
+                t_w = 0.8 * tree[3];
+                
+                dx = vmath.abs(cam_pos[0] - tree[0]);
+                dz = vmath.abs(cam_pos[2] - tree[2]);
+
+                if (dx < (p_size + t_w) && dz < (p_size + t_w)) {
+                    if (cam_pos[1] < (tree[3] * 10.0)) {
+                        crash_active = true;
+                        crash_timer = crash_duration;
+                        vaudio.play_sound(Audio.explosion_drone);
+                        vaudio.play_sound(Audio.explosion);
+                        vaudio.play_sound(Audio.signal_lost);
+                        break; 
+                    }
+                }
+            };
+        }
+    }
+
+    missions.update(cam_pos);
+
+    if (crash_active == true) {
+        crash_timer = crash_timer - 0.016;
+        ui_glitch_factor = 15.0;
+        screen_shake = vmath.random(-20, 20); 
+        if (crash_timer <= 0.0) {
+            crash_active = false;
+            signal_lost = true;
+        }
+    }
 
     if (Params.score > old_score) {
         ui_glitch_factor = 3.0;
@@ -170,7 +253,7 @@ while (vglib.running()) {
                 vglib.set_shader_value(Shaders.fog, "fogDensity", 0.004);
                 vglib.set_shader_value(Shaders.fog, "fogColor", [0.25, 0.27, 0.3, 1.0]);
 
-                vglib.plane_texture(Textures.slots[7], 0.0, 0.0, 0.0, 5000.0, 5000.0);
+                vglib.plane_texture(Textures.slots[7], 0.0, 0.0, 0.0, 10000.0, 10000.0);
                 
                 through w :: map_data -> loop {
                     dx = cam_pos[0] - w[0];
@@ -183,7 +266,6 @@ while (vglib.running()) {
 
                 vglib.draw_persistent_group("forest_trees", Models.tree_model, cam_pos, 2000.0);
                 missions.draw_3d_marker();
-                missions.draw_impact_smoke(camera, run_time);
             vglib.end_shader();
         vglib.end3d();
     vglib.end_texture_mode();
@@ -322,13 +404,28 @@ while (vglib.running()) {
                 vglib.line(cx - 20, cy, cx + 20, cy, u_col);
                 vglib.line(cx, cy - 20, cx, cy + 20, u_col);
 
-                alt_base_x = 100 + ui_offset_x;
-                alt_base_y = 400 + ui_offset_y;
-                through i :: 0..10 -> loop {
-                    curr_y = alt_base_y + (i * 30);
-                    vglib.line(alt_base_x, curr_y, alt_base_x + 20, curr_y, u_col);
-                    if (i % 2 == 0) {
-                        vglib.text_ex(Shaders.vcr_font, string(int64(cam_y + (5-i)*10)), alt_base_x - 30, curr_y - 10, 12, u_col);
+                alt_base_x = 80 + ui_offset_x;
+                alt_base_y = 540 + ui_offset_y;
+                scaling_factor = 3.0;
+
+                vglib.line(alt_base_x + 25, alt_base_y - 150, alt_base_x + 25, alt_base_y + 150, u_col);
+
+                through i :: -6..6 -> loop {
+                    offset_y = int64(cam_y * scaling_factor) % 30; 
+                    curr_y = alt_base_y - (i * 30) + offset_y;
+                    
+                    if (curr_y > (alt_base_y - 150)) {
+                        if (curr_y < (alt_base_y + 150)) {
+                            
+                            h_val = int64(cam_y / 10) * 10 + (i * 10);
+                            
+                            if (h_val % 20 == 0) {
+                                vglib.line(alt_base_x + 5, curr_y, alt_base_x + 25, curr_y, u_col);
+                                vglib.text_ex(Shaders.vcr_font, string(h_val), alt_base_x - 40, curr_y - 8, 14, u_col);
+                            } else {
+                                vglib.line(alt_base_x + 15, curr_y, alt_base_x + 25, curr_y, u_col);
+                            }
+                        }
                     }
                 };
 
@@ -357,53 +454,6 @@ while (vglib.running()) {
                 vglib.text_ex(Shaders.vcr_font, "ELV: " + string(int64(cam_y)) + "m MSL", 1650 + ui_offset_x, 100 + ui_offset_y, 18, u_col);
                 
                 vglib.text_ex(Shaders.vcr_font, "LOCKED", cx + size - 80 + ui_offset_x, cy + size + 10 + ui_offset_y, 15, u_col);
-                
-                f_speed = Engine.fly_speed;
-                
-                if (vglib.key_down(vglib.LEFT_SHIFT)) { f_speed = f_speed * 2.3; }
-
-                vglib.move_forward(camera, f_speed);
-                if (vglib.key_down(vglib.S)) { cam_y = cam_y + 0.5; }
-                if (vglib.key_down(vglib.W))  { cam_y = cam_y - 0.5; }
-
-                if (vglib.key_down(vglib.Q)) {
-                    target_roll = -30.0; 
-                    vglib.move_right(camera, -f_speed); 
-                } else if (vglib.key_down(vglib.E)) {
-                    target_roll = 30.0;
-                    vglib.move_right(camera, f_speed);
-                } else {
-                    target_roll = 0.0;
-                }
-
-                current_roll = current_roll + (target_roll - current_roll) * roll_speed;
-                vglib.set_roll(camera, current_roll);
-
-                vglib.set_camera_height(camera, cam_y);
-
-                missions.update(cam_pos);
-
-                if (cam_y <= 0.0) {
-                    if (crash_active == false && signal_lost == false) {
-                        crash_active = true;
-                        crash_timer = crash_duration;
-                        vaudio.play_sound(Audio.explosion_drone);
-                        vaudio.play_sound(Audio.explosion);
-                        vaudio.play_sound(Audio.signal_lost);
-                    }
-                }
-
-                if (crash_active == true) {
-                    crash_timer = crash_timer - 0.016;
-                    
-                    ui_glitch_factor = 15.0;
-                    screen_shake = vmath.random(-20, 20); 
-                    
-                    if (crash_timer <= 0.0) {
-                        crash_active = false;
-                        signal_lost = true;
-                    }
-                }
             }
         }
 

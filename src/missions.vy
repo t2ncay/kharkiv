@@ -15,7 +15,7 @@ group Params :: missions {
 
 fn :: missions generate_target() {
     tx = vmath.random(-2000, 2000);
-    tz = vmath.random(-2000, 2000);
+    tz = vmath.random(500, 2500); 
     ty = 0.0;
     
     target_pos = [tx, ty, tz];
@@ -83,30 +83,5 @@ fn :: missions draw_3d_marker() {
         z2 = target_pos[2] + vmath.sin(ang2) * target_radius;
         
         vglib.line_3d(x1, 1.0, z1, x2, 1.0, z2, vglib.RED);
-    };
-}
-
-fn :: missions draw_impact_smoke(camera, run_time) {
-    through impact :: Params.impacts -> loop {
-        ix = impact[0];
-        iz = impact[1];
-
-        smoke_col = vglib.rgba(20, 20, 20, 200); 
-        vglib.line_3d(ix, 0.0, iz, ix, 30.0, iz, smoke_col);
-
-        through layer :: 1..4 -> loop {
-            offset_y = (run_time * 5.0 * layer) % 50.0;
-            
-            drift_x = vmath.sin(run_time * 3.0 + layer) * (offset_y * 0.1);
-            drift_z = vmath.cos(run_time * 2.5 + layer) * (offset_y * 0.1);
-            
-            alpha = int64(200 - (offset_y * 4));
-            if (alpha < 0) { alpha = 0; }
-            
-            p_col = vglib.rgba(50, 50, 50, alpha);
-            
-            vglib.line_3d(ix + drift_x, offset_y, iz + drift_z, 
-                          ix + drift_x, offset_y + 5.0, iz + drift_z, p_col);
-        };
     };
 }
