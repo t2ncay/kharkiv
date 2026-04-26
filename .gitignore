@@ -1,0 +1,5 @@
+*.rar
+*.exe
+assets/*
+kharkiv/*
+*.dll
