@@ -110,8 +110,9 @@ void main() {
     finalRGB += pow(offset, 2.0) * 0.5;
 
     vec2 dist = fragTexCoord - vec2(0.5);
-    float vignette = 1.0 - dot(dist, dist) * 0.8;
+    float vignette = 1.0 - dot(dist, dist) * 0.4;
     finalRGB *= clamp(vignette, 0.0, 1.0);
 
+    finalRGB *= 1.2;
     finalColor = vec4(finalRGB, 1.0);
 }

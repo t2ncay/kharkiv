@@ -91,8 +91,8 @@ while (vglib.running()) {
     cam_y = cam_pos[1];
 
     mult = 1.0;
-    if (vglib.key_down(vglib.LEFT_SHIFT)) { mult = 2.4; } 
-    if (vglib.key_down(vglib.SPACE))      { mult = 6.0; } 
+    if (vglib.key_down(vglib.LEFT_SHIFT)) { mult = 2.8; } 
+    if (vglib.key_down(vglib.SPACE))      { mult = 5.0; } 
 
     target_vel_z = Engine.fly_speed * mult;
     vel_z = vel_z + (target_vel_z - vel_z) * 0.1;
