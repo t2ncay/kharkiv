@@ -14,8 +14,8 @@ group Params :: missions {
 };
 
 fn :: missions generate_target() {
-    tx = vmath.random(-2000, 2000);
-    tz = vmath.random(500, 2500); 
+    tx = vmath.random(-1000, 1000);
+    tz = vmath.random(500, 1500); 
     ty = 0.0;
 
     target_pos = [tx, ty, tz];
